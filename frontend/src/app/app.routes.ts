@@ -11,19 +11,27 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/dashboard/dashboard.component').then(m => m.DashboardComponent)
   },
   {
-    path: 'setup',
-    loadComponent: () => import('./pages/setup/setup.component').then(m => m.SetupComponent)
+    path: 'system',
+    loadComponent: () => import('./pages/system/system.component').then(m => m.SystemComponent)
+  },
+  {
+    path: 'plugins',
+    loadComponent: () => import('./pages/plugins/plugins.component').then(m => m.PluginsComponent)
+  },
+  {
+    path: 'updates',
+    loadComponent: () => import('./pages/updates/updates.component').then(m => m.UpdatesComponent)
+  },
+  {
+    path: 'logs',
+    loadComponent: () => import('./pages/logs/logs.component').then(m => m.LogsComponent)
+  },
+  {
+    path: 'system-updater',
+    loadComponent: () => import('./pages/system-updater/system-updater.component').then(m => m.SystemUpdaterComponent)
   },
   {
     path: 'modules',
-    loadComponent: () => import('./pages/modules/modules.component').then(m => m.ModulesComponent)
-  },
-  {
-    path: 'wlan',
-    loadComponent: () => import('./pages/wlan/wlan.component').then(m => m.WlanComponent)
-  },
-  {
-    path: 'system',
-    loadComponent: () => import('./pages/system/system.component').then(m => m.SystemComponent)
+    loadComponent: () => import('./pages/mm-modules/mm-modules.component').then(m => m.MMModulesComponent)
   }
 ];

@@ -3,7 +3,7 @@ Plugin Interface for MagicMirror Admin Platform
 All plugins must implement this interface
 """
 from abc import ABC, abstractmethod
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, List
 from fastapi import APIRouter
 import logging
 
@@ -150,6 +150,31 @@ class AdminPlugin(ABC):
         
         Returns:
             list: Permission strings
+        """
+        return []
+    
+    def get_sudo_commands(self) -> List:
+        """
+        Define sudo commands required by this plugin
+        
+        Returns:
+            list: List of SudoCommand objects
+            
+        Example:
+            from app.core.sudo_manager import SudoCommand
+            return [
+                SudoCommand(
+                    command="/usr/bin/systemctl restart magicmirror",
+                    description="Restart MagicMirror service"
+                ),
+                SudoCommand(
+                    command="/usr/bin/apt-get update",
+                    description="Update package list"
+                )
+            ]
+        
+        Note: Commands are registered automatically on plugin load
+              and removed on plugin unload. Only on Linux production systems.
         """
         return []
     

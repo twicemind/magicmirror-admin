@@ -42,3 +42,7 @@ build/
 .pytest_cache/
 .coverage
 htmlcov/
+
+# Plugin symlinks (external repositories)
+backend/app/plugins/ap_modules
+backend/app/plugins/ap_systemupdater

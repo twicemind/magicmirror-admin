@@ -10,6 +10,7 @@ import logging
 
 from app.core.plugin_interface import AdminPlugin
 from app.core.config import settings
+from app.core.sudo_manager import get_sudo_manager
 
 logger = logging.getLogger(__name__)
 
@@ -92,10 +93,23 @@ class PluginLoader:
             # Call on_load hook
             await plugin_instance.on_load()
             
+            # Register sudo commands
+            sudo_commands = plugin_instance.get_sudo_commands()
+            if sudo_commands:
+                sudo_manager = get_sudo_manager()
+                success = sudo_manager.register_plugin_permissions(
+                    plugin_instance.plugin_id,
+                    sudo_commands
+                )
+                if success:
+                    logger.info(f"✓ Registered {len(sudo_commands)} sudo commands for '{plugin_instance.plugin_id}'")
+                else:
+                    logger.error(f"✗ Failed to register sudo commands for '{plugin_instance.plugin_id}'")
+            
             # Store plugin
             self.plugins[plugin_instance.plugin_id] = plugin_instance
             
-            logger.info(f"✓ Loaded plugin: {plugin_instance}")
+            logger.info(f"✓ Loaded plugin: {plugin_instance.plugin_name} v{plugin_instance.plugin_version}")
             
         except ImportError as e:
             logger.error(f"Import error for plugin '{plugin_name}': {e}")
@@ -106,8 +120,14 @@ class PluginLoader:
         """Unload all plugins"""
         logger.info("Unloading all plugins")
         
+        sudo_manager = get_sudo_manager()
+        
         for plugin_id, plugin in self.plugins.items():
             try:
+                # Unregister sudo commands
+                sudo_manager.unregister_plugin_permissions(plugin_id)
+                
+                # Call plugin hook
                 await plugin.on_unload()
                 logger.info(f"✓ Unloaded plugin: {plugin_id}")
             except Exception as e:

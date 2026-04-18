@@ -5,6 +5,7 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 import subprocess
 import logging
+import time
 
 logger = logging.getLogger(__name__)
 
@@ -28,31 +29,31 @@ class ServiceControl(BaseModel):
 async def get_system_info():
     """Get system information"""
     try:
+        import platform
+        import psutil
+        
         # Get hostname
-        hostname_result = subprocess.run(
-            ["hostname"],
-            capture_output=True,
-            text=True,
-            timeout=5
-        )
-        hostname = hostname_result.stdout.strip()
+        hostname = platform.node()
         
         # Get uptime
-        uptime_result = subprocess.run(
-            ["uptime", "-p"],
-            capture_output=True,
-            text=True,
-            timeout=5
-        )
-        uptime = uptime_result.stdout.strip()
+        boot_time = psutil.boot_time()
+        uptime_seconds = time.time() - boot_time
+        uptime_hours = int(uptime_seconds // 3600)
+        uptime_minutes = int((uptime_seconds % 3600) // 60)
+        uptime = f"up {uptime_hours} hours, {uptime_minutes} minutes"
+        
+        # Get resource usage
+        cpu_usage = psutil.cpu_percent(interval=1)
+        memory = psutil.virtual_memory()
+        disk = psutil.disk_usage('/')
         
         return {
             "hostname": hostname,
-            "platform": "linux",
+            "platform": platform.system().lower(),
             "uptime": uptime,
-            "cpu_usage": 0.0,  # TODO: Implement actual monitoring
-            "memory_usage": 0.0,
-            "disk_usage": 0.0
+            "cpu_usage": cpu_usage,
+            "memory_usage": memory.percent,
+            "disk_usage": disk.percent
         }
     except Exception as e:
         logger.error(f"Error getting system info: {e}")
