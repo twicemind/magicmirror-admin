@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.backend
+    container_name: mm-admin-backend
+    ports:
+      - "8000:8000"
+    environment:
+      - ENVIRONMENT=development
+      - DEBUG=true
+    volumes:
+      - ../backend/app:/app/app
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.frontend
+    container_name: mm-admin-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+  # Optional: MagicMirror mock for testing
+  magicmirror-mock:
+    image: nginx:alpine
+    container_name: mm-mock
+    ports:
+      - "8080:80"
+    volumes:
+      - ./mock-mm.html:/usr/share/nginx/html/index.html:ro
+    restart: unless-stopped

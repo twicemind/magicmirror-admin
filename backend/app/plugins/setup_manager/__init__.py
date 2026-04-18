@@ -1,0 +1,3 @@
+"""
+Setup Manager Plugin Package
+"""
